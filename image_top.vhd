@@ -14,9 +14,9 @@ use ieee.numeric_std.all;
 
 entity image_top is
 Port ( clk: in std_logic;
-        vga_hs, vga_vs : out std_logic;
-        vga_r, vga_b: out std_logic_vector(4 downto 0);
-        vga_g: out std_logic_vector(5 downto 0));
+        clk_n, clk_p, hdmi_out_en: out std_logic;
+        n, p: out std_logic_vector (2 downto 0));
+        
 end image_top;
 
 architecture Behavioral of image_top is
@@ -42,6 +42,15 @@ Port (  clk, en, VS, vid: in std_logic;
 	G : out std_logic_vector(5 downto 0);
         addr: out std_logic_vector(17 downto 0));
 end component;
+component rgb2dvi_0
+Port(vid_pData : in std_logic_vector(23 downto 0); 
+     vid_pHSync, vid_pVSync,vid_pVDE : in std_logic;
+    aRst,PixelClk,SerialClk : in std_logic; 
+    TMDS_Clk_p : out std_logic; 
+    TMDS_Clk_n : out std_logic; 
+    TMDS_Data_p : out std_logic_vector(2 downto 0); 
+    TMDS_Data_n : out std_logic_vector(2 downto 0)); 
+end component;
 component vga_ctrl
 Port (  clk, en: in std_logic;
         hcount, vcount:out std_logic_vector(9 downto 0) ;
@@ -52,7 +61,13 @@ signal addr : std_logic_vector(17 downto 0);
 signal pixels : std_logic_vector(7 downto 0);
 signal vs, vid : std_logic;
 signal hcount : std_logic_vector(9 downto 0);
+signal vga_hs, vga_vs :  std_logic;
+signal     vga_r, vga_b:  std_logic_vector(4 downto 0);
+signal    vga_g:  std_logic_vector(5 downto 0);
+signal full_data: std_logic_vector(23 downto 0);
 begin
+hdmi_out_en <= '0';
+full_data <= "000" & vga_r & "00" & vga_g & "000" & vga_b;
 Two5mHz : clock_div
 port map(clk => clk, div => en); 
 u2 : picture
@@ -62,4 +77,16 @@ port map(clk => clk, en => en, VS => vs, vid => vid, pixel => pixels, hcount => 
 R => vga_r, B => vga_b, G => vga_g);
 u4: vga_ctrl
 port map(clk => clk, en => en, hs => vga_hs, vs => vga_vs, vid => vid, hcount => hcount);
+u5: rgb2dvi_0
+port map(vid_pData => full_data, 
+         vid_pHSync => vga_hs,
+         vid_pVSync => vga_vs,
+         vid_pVDE => vid,
+         aRst => '0', 
+         SerialClk => clk, 
+         PixelClk => en,
+         TMDS_Clk_p => clk_p,
+         TMDS_Clk_n => clk_n, 
+         TMDS_Data_p => p,
+         TMDS_Data_n => n);
 end Behavioral;

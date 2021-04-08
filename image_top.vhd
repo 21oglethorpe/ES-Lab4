@@ -23,7 +23,7 @@ architecture Behavioral of image_top is
 component clock_div
 port (
   clk : in std_logic;
-  div : out std_logic :='0'
+  div : out std_logic
 );
 end component;
 component picture
@@ -59,24 +59,31 @@ end component;
 signal en : std_logic;
 signal addr : std_logic_vector(17 downto 0);
 signal pixels : std_logic_vector(7 downto 0);
-signal vs, vid : std_logic;
-signal hcount : std_logic_vector(9 downto 0);
+signal vid : std_logic;
+signal hcount, vcount : std_logic_vector(9 downto 0);
 signal vga_hs, vga_vs :  std_logic;
 signal     vga_r, vga_b:  std_logic_vector(4 downto 0);
 signal    vga_g:  std_logic_vector(5 downto 0);
 signal full_data: std_logic_vector(23 downto 0);
+signal r, g, b : std_logic_vector(7 downto 0);
 begin
-hdmi_out_en <= '0';
-full_data <= "000" & vga_r & "00" & vga_g & "000" & vga_b;
+--r <= std_logic_vector(unsigned(vga_r)*255/31);
+--b <= std_logic_vector(unsigned(vga_b)*255/31);
+--g <= std_logic_vector(unsigned(vga_g)*255/63);
+r <=  vga_r & "000";
+b <= vga_b & "000";
+g <= vga_g & "00";
+hdmi_out_en <= '1';
+full_data <= r & g & b;
 Two5mHz : clock_div
 port map(clk => clk, div => en); 
 u2 : picture
 port map(clka => clk, addra => addr, douta => pixels);
 u3: pixel_pusher
-port map(clk => clk, en => en, VS => vs, vid => vid, pixel => pixels, hcount => hcount,
+port map(clk => clk, en => en, VS => vga_vs, vid => vid, pixel => pixels, hcount => hcount, addr => addr,
 R => vga_r, B => vga_b, G => vga_g);
 u4: vga_ctrl
-port map(clk => clk, en => en, hs => vga_hs, vs => vga_vs, vid => vid, hcount => hcount);
+port map(clk => clk, en => en, hs => vga_hs, vs => vga_vs, vid => vid, hcount => hcount, vcount => vcount);
 u5: rgb2dvi_0
 port map(vid_pData => full_data, 
          vid_pHSync => vga_hs,

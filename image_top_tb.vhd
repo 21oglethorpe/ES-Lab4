@@ -41,8 +41,8 @@ Port ( clk: in std_logic;
         clk_n, clk_p, hdmi_out_en: out std_logic;
         n, p: out std_logic_vector (2 downto 0));
         end component;
-signal clk, clk_n, clk_p, hdmi_out_en : std_logic;
-signal n, p:  std_logic_vector(2 downto 0);
+signal clk, clk_n, clk_p, hdmi_out_en : std_logic := '0';
+signal n, p:  std_logic_vector(2 downto 0) := (others => '0');
 
 
 begin

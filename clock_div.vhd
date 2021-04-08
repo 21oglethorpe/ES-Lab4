@@ -17,7 +17,7 @@ begin
     begin
         if rising_edge(clk) then
         
-                if (unsigned(counter) < 5) then
+                if (unsigned(counter) < 4) then
                     counter <= std_logic_vector(unsigned(counter) + 1);
                 else 
                     counter <= (others => '0');

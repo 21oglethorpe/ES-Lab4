@@ -67,12 +67,10 @@ signal    vga_g:  std_logic_vector(5 downto 0);
 signal full_data: std_logic_vector(23 downto 0);
 signal r, g, b : std_logic_vector(7 downto 0);
 begin
---r <= std_logic_vector(unsigned(vga_r)*255/31);
---b <= std_logic_vector(unsigned(vga_b)*255/31);
---g <= std_logic_vector(unsigned(vga_g)*255/63);
-r <=  vga_r & "000";
-b <= vga_b & "000";
-g <= vga_g & "00";
+r <= std_logic_vector(to_unsigned(to_integer(unsigned(vga_r))*255/7, 8));
+b <= std_logic_vector(to_unsigned(to_integer(unsigned(vga_b))*255/3, 8));
+g <= std_logic_vector(to_unsigned(to_integer(unsigned(vga_g))*255/7, 8));
+
 hdmi_out_en <= '1';
 full_data <= r & g & b;
 Two5mHz : clock_div

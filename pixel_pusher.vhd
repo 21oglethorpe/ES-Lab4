@@ -38,6 +38,6 @@ begin
             	R <= (others => '0');         B <= (others => '0');        G <= (others => '0');
     		end if;
     end if;
-    
+    end if;
 end process;
 end Behavioral;

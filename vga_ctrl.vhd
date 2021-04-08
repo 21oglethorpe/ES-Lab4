@@ -41,38 +41,41 @@ end vga_ctrl;
 architecture Behavioral of vga_ctrl is
 signal hreg, vreg : std_logic_vector(9 downto 0):= (others => '0');
 begin
-hcount <= hreg;
-vcount <= vreg;
+
 process(clk)
 begin
     if rising_edge(clk) then
-    if(en = '1') then
-        if(unsigned(hreg) < 799) then
-            hreg <= std_logic_vector(unsigned(hreg)+1);
-        else
-            hreg <= (others => '0');
-            if(unsigned(vreg) < 524) then
-                  vreg <= std_logic_vector(unsigned(vreg)+1);
-            else
-                  vreg <= (others => '0');
-             end if;
-        end if;
-    end if;
-    if(unsigned(hreg) < 640 AND unsigned(vreg) < 480) then
+    hcount <= hreg;
+vcount <= vreg;
+    if(unsigned(hreg) >= 0 AND unsigned(hreg) <= 639 AND unsigned(vreg) >= 0 AND unsigned(vreg) <= 479) then
     vid <= '1';
     else
     vid <= '0';
     end if;
-    if(unsigned(hreg) < 656 OR unsigned(hreg) > 751) then
-        hs <= '1';
-    else
+    if(unsigned(hreg) >= 656 AND unsigned(hreg) <= 751) then
         hs <= '0';
+    else
+        hs <= '1';
     end if;
-    if(unsigned(hreg) = 490 OR unsigned(hreg) = 491) then
+    if(unsigned(vreg) = 490 OR unsigned(vreg) = 491) then
         vs <= '0';
     else
         vs <= '1';
     end if;
+    if(en = '1') then
+            if(unsigned(hreg) < 799) then
+                hreg <= std_logic_vector(unsigned(hreg)+1);
+                
+            else
+            
+                hreg <= (others => '0');
+                if(unsigned(vreg) < 524) then
+                      vreg <= std_logic_vector(unsigned(vreg)+1);
+                else
+                      vreg <= (others => '0');
+                 end if;
+            end if;
+        end if;
     end if;
 end process;
 end Behavioral;
